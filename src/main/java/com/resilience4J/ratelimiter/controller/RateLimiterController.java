@@ -3,20 +3,20 @@ package com.resilience4J.ratelimiter.controller;
 import com.resilience4J.ratelimiter.service.RateLimiterService;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 
 @Slf4j
 @RestController
 public class RateLimiterController {
-
 
     private final RateLimiterService rateLimiterService;
 
     public RateLimiterController(RateLimiterService rateLimiterService) {
         this.rateLimiterService = rateLimiterService;
     }
+
 
     /**
      * Endpoint to access the first API.
@@ -42,5 +42,17 @@ public class RateLimiterController {
     public String rateLimiterFallback(Throwable t) {
         log.warn("Rate limit exceeded: {}", t.getMessage());
         return "Rate limit exceeded. Please try again later.";
+    }
+
+    /**
+     * Endpoint to access the second API.
+     * This API uses a retry mechanism to handle transient failures.
+     *
+     * @return A message indicating whether access was successful or retry attempts were exhausted.
+     */
+    @GetMapping("/api/second")
+    public String accessSecondApi() {
+        log.info("Received request to access Second API");
+        return rateLimiterService.accessSecondApi();
     }
 }
